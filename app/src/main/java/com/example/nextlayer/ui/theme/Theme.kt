@@ -81,18 +81,26 @@ fun NextLayerTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+    
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            val context = view.context
+            
+            // LOGIKA MURNI PENGAMAN:
+            // Cek dulu apakah context ini Activity. 
+            // Karena UI lu jalan di Service (Overlay), kalau nggak dicek bakal ClassCastException.
+            if (context is Activity) {
+                val window = context.window
+                window.statusBarColor = colorScheme.background.toArgb()
+                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            }
         }
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = Typography, // Ngambil dari Type.kt lu
         content = content
     )
 }

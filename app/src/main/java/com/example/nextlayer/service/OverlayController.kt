@@ -29,7 +29,7 @@ class OverlayController(private val context: Context) {
 
     private var isExpanded = false
 
-    // Layout Params dasar: Mulai sebagai Kapsul di tengah atas (Android 16 style)
+    // Layout Params dasar: Pindah ke KIRI ATAS (Samping Jam)
     private val layoutParams = WindowManager.LayoutParams(
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.WRAP_CONTENT,
@@ -40,8 +40,9 @@ class OverlayController(private val context: Context) {
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
         PixelFormat.TRANSLUCENT
     ).apply {
-        gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-        y = 50 // Margin dari atas
+        gravity = Gravity.TOP or Gravity.START
+        x = 40 // Geser dari bezel kiri
+        y = 30 // Sejajar sama jam status bar
     }
 
     fun showOverlay(notificationsFlow: StateFlow<List<StatusBarNotification>>) {
@@ -50,10 +51,8 @@ class OverlayController(private val context: Context) {
         lifecycleOwner = ComposeLifecycleOwner().apply { start() }
         
         composeView = ComposeView(context).apply {
-            // Tangkap tombol back pakai listener biasa (Karena ComposeView itu final)
             setOnKeyListener { _, keyCode, event ->
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP && isExpanded) {
-                    // Tarikan 2 nanti kita sambungin biar panel nutup dengan animasi
                     true
                 } else {
                     false
@@ -72,7 +71,7 @@ class OverlayController(private val context: Context) {
                             updateWindowFlags(expand) 
                         },
                         onAnimationFinished = { expanded ->
-                            // Cleanup jika diperlukan pasca animasi
+                            // Cleanup jika diperlukan
                         }
                     )
                 }
@@ -103,24 +102,17 @@ class OverlayController(private val context: Context) {
         isAttached = false
     }
 
-    /**
-     * Rahasia Android 16 Feel: 
-     * Saat kapsul -> Ga bisa di-fokus, sentuhan tembus ke belakang.
-     * Saat panel -> Fokus penuh, nangkep tombol back, lebar full screen.
-     */
     private fun updateWindowFlags(expand: Boolean) {
         if (isExpanded == expand || !isAttached) return
         isExpanded = expand
         
         if (expand) {
-            // Jadi Panel Control (nangkep sentuhan & fokus)
             layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
             layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT
             layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                                  WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
                                  WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         } else {
-            // Kembali jadi Kapsul
             layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT
             layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT
             layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or

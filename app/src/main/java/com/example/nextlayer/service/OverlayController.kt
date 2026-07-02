@@ -49,16 +49,17 @@ class OverlayController(private val context: Context) {
 
         lifecycleOwner = ComposeLifecycleOwner().apply { start() }
         
-        composeView = object : ComposeView(context) {
-            // Tangkap tombol back saat panel terbuka
-            override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-                if (event.keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP && isExpanded) {
-                    // Update state di UI nanti akan memicu onExpansionIntent(false)
-                    return true
+        composeView = ComposeView(context).apply {
+            // Tangkap tombol back pakai listener biasa (Karena ComposeView itu final)
+            setOnKeyListener { _, keyCode, event ->
+                if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP && isExpanded) {
+                    // Tarikan 2 nanti kita sambungin biar panel nutup dengan animasi
+                    true
+                } else {
+                    false
                 }
-                return super.dispatchKeyEvent(event)
             }
-        }.apply {
+
             setViewTreeLifecycleOwner(lifecycleOwner)
             setViewTreeViewModelStoreOwner(lifecycleOwner)
             setViewTreeSavedStateRegistryOwner(lifecycleOwner)

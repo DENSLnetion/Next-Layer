@@ -1,6 +1,0 @@
-{
-  "name": "Next Layer",
-  "description": "System overlay app replacing Control Panel and Quick Settings for Android 16.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

@@ -36,7 +36,6 @@ fun CapsuleNotification(
     transitionFraction: Float,
     isSquishing: Boolean
 ) {
-    // Reaksi fisik: Elemen internal mengecil saat kapsul ditarik (haptic feedback visual)
     val internalScale by animateFloatAsState(
         targetValue = if (isSquishing) 0.92f else 1f,
         animationSpec = spring(dampingRatio = 0.6f, stiffness = 300f),
@@ -45,7 +44,7 @@ fun CapsuleNotification(
 
     Box(
         modifier = modifier
-            .background(Color(0xFF0F0F0F)) // Deep dark murni ala hardware cutout
+            .background(Color(0xFF0F0F0F))
             .alpha(1f - transitionFraction),
         contentAlignment = Alignment.Center
     ) {
@@ -73,7 +72,8 @@ fun CapsuleNotification(
             Spacer(modifier = Modifier.width(10.dp))
             
             if (notification != null) {
-                val title = notification.notification.extras.getString("android.title") ?: "New notification"
+                // BUG FIX: Pake safety call (?.) karena OS kadang ngirim notif kosong
+                val title = notification.notification.extras?.getString("android.title") ?: "New notification"
                 Text(
                     text = title,
                     style = MaterialTheme.typography.labelLarge,

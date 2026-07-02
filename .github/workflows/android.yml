@@ -22,7 +22,6 @@ jobs:
         with:
           gradle-version: '9.3.1'
 
-      # Bikin debug keystore langsung di runner supaya gak perlu secret
       - name: Create debug keystore
         run: |
           keytool -genkeypair \
@@ -33,11 +32,10 @@ jobs:
             -keystore debug.keystore \
             -dname "CN=Android Debug,O=Android,C=US"
 
-      # Eksekusi build untuk Debug APK, skip semua urusan Release
+      # Ganti ./gradlew jadi gradle (panggil gradle dari sistem runner)
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: gradle assembleDebug --stacktrace
 
-      # Upload hasil APK ke tab Actions di GitHub
       - name: Upload Debug Artifact
         uses: actions/upload-artifact@v4
         with:

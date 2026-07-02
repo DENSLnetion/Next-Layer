@@ -58,7 +58,6 @@ fun ControlPanel(
     onClose: () -> Unit,
     transitionFraction: Float
 ) {
-    // State buat nentuin tile mana yang lagi di-long press (Morphing Mode)
     var expandedTile by remember { mutableStateOf<String?>(null) }
     val scrollState = rememberScrollState()
 
@@ -69,7 +68,6 @@ fun ControlPanel(
             .alpha(transitionFraction)
             .verticalScroll(scrollState)
     ) {
-        // Header
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -88,12 +86,10 @@ fun ControlPanel(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Morphing Quick Tiles Area
         Column(
             modifier = Modifier.animateContentSize(animationSpec = spring(dampingRatio = 0.7f, stiffness = 300f)),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Baris 1: Wi-Fi & Bluetooth
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 MorphingTile(
                     modifier = Modifier.weight(if (expandedTile == "WiFi") 1f else 0.5f),
@@ -117,7 +113,6 @@ fun ControlPanel(
                 )
             }
             
-            // Baris 2: Flashlight & Airplane
             AnimatedVisibility(visible = expandedTile == null) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     MorphingTile(
@@ -184,7 +179,7 @@ fun ControlPanel(
             }
         }
         
-        Spacer(modifier = Modifier.height(48.dp)) // Bottom padding
+        Spacer(modifier = Modifier.height(48.dp))
     }
 }
 
@@ -199,18 +194,17 @@ fun MorphingTile(
     onTap: () -> Unit,
     onLongPress: () -> Unit
 ) {
-    // Kalau ada tile lain yang lagi morphing, tile ini ngumpet (menghindar)
     AnimatedVisibility(
         visible = !isAnotherExpanded,
         modifier = modifier
     ) {
-        val height = if (isExpanded) 180.dp else 88.dp // Berubah tinggi drastis pas ditarik
+        val height = if (isExpanded) 180.dp else 88.dp
         
         Box(
             modifier = Modifier
                 .height(height)
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(32.dp)) // Radius gede khas M3
+                .clip(RoundedCornerShape(32.dp))
                 .background(if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant)
                 .pointerInput(Unit) {
                     detectTapGestures(
@@ -259,13 +253,11 @@ fun MorphingTile(
                     color = (if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant).copy(alpha = 0.7f)
                 )
                 
-                // Konten ekstra yang muncul saat Tile membesar (Morphing)
                 AnimatedVisibility(visible = isExpanded) {
                     Column(modifier = Modifier.padding(top = 16.dp)) {
                         Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f)))
                         Spacer(modifier = Modifier.height(12.dp))
                         Text("Available Networks", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                        // Mockup isi jaringan
                         Text("NextLayer_5G", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f))
                     }
                 }
@@ -279,7 +271,7 @@ fun MediaPlayerCard() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(36.dp)) // Asymmetric radius ala Android 16
+            .clip(RoundedCornerShape(36.dp))
             .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(24.dp)
     ) {
@@ -311,7 +303,6 @@ fun MediaPlayerCard() {
             }
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Custom Thick Progress Bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -321,7 +312,7 @@ fun MediaPlayerCard() {
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.35f) // 35% progress
+                        .fillMaxWidth(0.35f)
                         .height(12.dp)
                         .clip(RoundedCornerShape(6.dp))
                         .background(MaterialTheme.colorScheme.onSecondaryContainer)
@@ -347,14 +338,15 @@ fun MediaPlayerCard() {
 
 @Composable
 fun NotificationItem(sbn: StatusBarNotification) {
-    val title = sbn.notification.extras.getString("android.title") ?: "Notification"
-    val text = sbn.notification.extras.getCharSequence("android.text")?.toString() ?: ""
+    // BUG FIX: Safety check buat extras notifikasi
+    val title = sbn.notification.extras?.getString("android.title") ?: "Notification"
+    val text = sbn.notification.extras?.getCharSequence("android.text")?.toString() ?: ""
     
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)) // Transparansi halus
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
             .clickable { /* Tindakan klik notif */ }
             .padding(20.dp)
     ) {
